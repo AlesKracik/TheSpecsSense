@@ -1,0 +1,4 @@
+Quint counterexample traces are committed here as `<INV-id>-<timestamp>.txt`.
+Each trace must have a corresponding follow-up PR proposing either a spec fix
+or an invariant weakening. Traces are not auto-deleted; resolved ones stay as
+audit history.

@@ -1,0 +1,4 @@
+{
+  "$schema": "../.ci/schemas/adversarial.schema.json",
+  "scenarios": []
+}

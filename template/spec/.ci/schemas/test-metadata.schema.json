@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "test-metadata.schema.json",
+  "title": "Per-test metadata",
+  "type": "object",
+  "required": ["id", "test_class", "derives_from", "source_path", "_note"],
+  "properties": {
+    "$schema": {"type": "string"},
+    "id": {"$ref": "_common.schema.json#/$defs/id"},
+    "test_class": {
+      "type": "string",
+      "enum": [
+        "state_transition",
+        "boundary_equivalence",
+        "cross_entity_interaction",
+        "property_based",
+        "model_check",
+        "acceptance_slo",
+        "security_chaos",
+        "assumption_violation"
+      ]
+    },
+    "derives_from": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "_common.schema.json#/$defs/id"},
+      "description": "Spec artifact ID(s) this test exercises."
+    },
+    "source_path": {"type": "string", "description": "Path under tests/src/ to the test file."},
+    "framework": {"type": "string"},
+    "rationale": {"$ref": "_common.schema.json#/$defs/rationale"},
+    "_note": {"$ref": "_common.schema.json#/$defs/note"}
+  }
+}

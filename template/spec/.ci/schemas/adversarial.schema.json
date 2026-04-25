@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "adversarial.schema.json",
+  "title": "Round 7 — Adversarial scenarios (STRIDE)",
+  "type": "object",
+  "required": ["scenarios"],
+  "properties": {
+    "$schema": {"type": "string"},
+    "scenarios": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "stride_category", "scenario", "affected_asset", "severity", "likelihood", "mitigation_requirement", "mitigation_status", "_note"],
+        "properties": {
+          "id": {"$ref": "_common.schema.json#/$defs/id"},
+          "stride_category": {
+            "type": "string",
+            "enum": ["spoofing", "tampering", "repudiation", "information_disclosure", "denial_of_service", "elevation_of_privilege"]
+          },
+          "scenario": {"type": "string"},
+          "affected_asset": {"type": "string"},
+          "attack_vector": {"type": "string"},
+          "severity": {"$ref": "_common.schema.json#/$defs/severity"},
+          "likelihood": {"type": "string", "enum": ["low", "medium", "high"]},
+          "mitigation_requirement": {"type": "string"},
+          "mitigation_status": {"type": "string", "enum": ["specified", "partial", "accepted_risk", "open"]},
+          "accepted_risk_signoff": {
+            "type": "object",
+            "properties": {
+              "by": {"type": "string"},
+              "on": {"type": "string", "format": "date"}
+            }
+          },
+          "rationale": {"$ref": "_common.schema.json#/$defs/rationale"},
+          "_note": {"$ref": "_common.schema.json#/$defs/note"}
+        },
+        "allOf": [
+          {
+            "if": {"properties": {"mitigation_status": {"const": "accepted_risk"}}},
+            "then": {"required": ["accepted_risk_signoff"]}
+          }
+        ]
+      }
+    }
+  }
+}

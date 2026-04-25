@@ -1,0 +1,4 @@
+{
+  "$schema": "../.ci/schemas/quality.schema.json",
+  "qualities": []
+}

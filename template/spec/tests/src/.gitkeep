@@ -1,0 +1,2 @@
+Test source code. Language and framework choice is project-specific.
+Each test file links to its metadata via the metadata's `source_path` field.

@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "interaction.schema.json",
+  "title": "Round 4 — Cross-product interactions",
+  "type": "object",
+  "required": ["interactions"],
+  "properties": {
+    "$schema": {"type": "string"},
+    "interactions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "entity_a", "entity_b", "family", "specified_behavior", "_note"],
+        "properties": {
+          "id": {"$ref": "_common.schema.json#/$defs/id"},
+          "entity_a": {"$ref": "_common.schema.json#/$defs/id"},
+          "entity_b": {"$ref": "_common.schema.json#/$defs/id"},
+          "entity_c": {"$ref": "_common.schema.json#/$defs/id", "description": "Optional third entity for genuinely 3-way interactions."},
+          "family": {
+            "type": "string",
+            "enum": ["concurrency", "lifecycle_overlap", "resource_contention", "temporal_ordering", "independent", "other"]
+          },
+          "situation": {"type": "string"},
+          "specified_behavior": {"type": "string"},
+          "precedence": {"type": "string"},
+          "rationale": {"$ref": "_common.schema.json#/$defs/rationale"},
+          "_note": {"$ref": "_common.schema.json#/$defs/note"}
+        }
+      }
+    }
+  }
+}

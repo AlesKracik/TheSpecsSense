@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "state-machine.schema.json",
+  "title": "Round 2 — State-event matrix",
+  "type": "object",
+  "required": ["entity", "states", "events", "cells"],
+  "properties": {
+    "$schema": {"type": "string"},
+    "entity": {"$ref": "_common.schema.json#/$defs/id"},
+    "states": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"type": "string", "pattern": "^[A-Z][A-Z0-9_]*$"}
+    },
+    "events": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"type": "string", "pattern": "^[a-z][a-z0-9_]*$"}
+    },
+    "cells": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "state", "event", "kind", "_note"],
+        "properties": {
+          "id": {"$ref": "_common.schema.json#/$defs/id"},
+          "state": {"type": "string"},
+          "event": {"type": "string"},
+          "kind": {"type": "string", "enum": ["transition", "noop", "impossible"]},
+          "next_state": {"type": "string"},
+          "guard": {"type": "string"},
+          "actions": {"type": "array", "items": {"type": "string"}},
+          "output_events": {"type": "array", "items": {"type": "string"}},
+          "justification_ref": {"$ref": "_common.schema.json#/$defs/id", "description": "Required when kind == 'impossible'. References the invariant or mechanism that makes this cell unreachable."},
+          "rationale": {"$ref": "_common.schema.json#/$defs/rationale"},
+          "_note": {"$ref": "_common.schema.json#/$defs/note"}
+        },
+        "allOf": [
+          {
+            "if": {"properties": {"kind": {"const": "transition"}}},
+            "then": {"required": ["next_state"]}
+          },
+          {
+            "if": {"properties": {"kind": {"const": "impossible"}}},
+            "then": {"required": ["justification_ref"]}
+          }
+        ]
+      }
+    }
+  }
+}

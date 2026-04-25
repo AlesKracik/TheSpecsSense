@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "entity.schema.json",
+  "title": "Round 1 — Entity catalog",
+  "type": "object",
+  "required": ["entities"],
+  "properties": {
+    "$schema": {"type": "string"},
+    "entities": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "name", "kind", "_note"],
+        "properties": {
+          "id": {"$ref": "_common.schema.json#/$defs/id"},
+          "name": {"type": "string", "minLength": 1},
+          "kind": {"type": "string", "enum": ["stateful", "value", "ephemeral"]},
+          "attributes": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["name", "type", "range"],
+              "properties": {
+                "name": {"type": "string"},
+                "type": {"type": "string"},
+                "range": {"type": "string"}
+              }
+            }
+          },
+          "rationale": {"$ref": "_common.schema.json#/$defs/rationale"},
+          "_note": {"$ref": "_common.schema.json#/$defs/note"}
+        }
+      }
+    }
+  }
+}

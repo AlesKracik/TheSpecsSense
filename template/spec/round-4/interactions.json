@@ -1,0 +1,4 @@
+{
+  "$schema": "../.ci/schemas/interaction.schema.json",
+  "interactions": []
+}

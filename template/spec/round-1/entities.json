@@ -1,0 +1,4 @@
+{
+  "$schema": "../.ci/schemas/entity.schema.json",
+  "entities": []
+}

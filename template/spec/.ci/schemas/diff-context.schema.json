@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "diff-context.schema.json",
+  "title": "Tier-3 PR annotation",
+  "type": "object",
+  "required": ["change_id", "round", "severity", "commit", "status", "affected_artifact", "_note"],
+  "properties": {
+    "$schema": {"type": "string"},
+    "change_id": {"$ref": "_common.schema.json#/$defs/id"},
+    "round": {"type": "integer", "minimum": 1, "maximum": 9},
+    "severity": {"$ref": "_common.schema.json#/$defs/severity"},
+    "commit": {"type": "string", "pattern": "^[0-9a-f]{7,40}$"},
+    "status": {"type": "string", "enum": ["draft", "awaiting_review", "approved", "rejected", "merged"]},
+    "affected_artifact": {"type": "string"},
+    "before": {"type": "object"},
+    "after": {"type": "object"},
+    "rationale": {"$ref": "_common.schema.json#/$defs/rationale"},
+    "spatial_context": {
+      "type": "object",
+      "required": ["_note"],
+      "properties": {
+        "same_row": {"type": "array"},
+        "same_column": {"type": "array"},
+        "neighbors": {"type": "array"},
+        "_note": {"$ref": "_common.schema.json#/$defs/note"}
+      }
+    },
+    "depends_on_this": {
+      "type": "object",
+      "required": ["_note"],
+      "properties": {
+        "requirements": {"type": "array", "items": {"$ref": "_common.schema.json#/$defs/id"}},
+        "tests_obsoleted": {"type": "array", "items": {"$ref": "_common.schema.json#/$defs/id"}},
+        "tests_to_regenerate": {"type": "array", "items": {"$ref": "_common.schema.json#/$defs/id"}},
+        "_note": {"$ref": "_common.schema.json#/$defs/note"}
+      }
+    },
+    "alternatives": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["option", "selected"],
+        "properties": {
+          "option": {"type": "string"},
+          "selected": {"type": "boolean"},
+          "rejection_reason": {"type": "string"}
+        }
+      }
+    },
+    "decision": {
+      "type": "object",
+      "properties": {
+        "tracked_via": {"type": "string"},
+        "awaiting_review_from": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "_note": {"$ref": "_common.schema.json#/$defs/note"}
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "_common.schema.json",
+  "title": "Specs Sense — common definitions",
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[A-Z][A-Z0-9_]*(\\.[A-Za-z][A-Za-z0-9_]*)+$",
+      "description": "Stable, dotted ID. Convention: <RoundPrefix>.<ENTITY>.<DETAIL> (e.g. C2.PENDING.payment_succeeded, INV.NO_OVERSUBSCRIPTION, A8.ENV.ntp_sync)."
+    },
+    "note": {
+      "type": "string",
+      "minLength": 40,
+      "maxLength": 300,
+      "description": "Faithful prose rendering of the record. 1-3 short sentences. Must match the data: no added facts, no omitted material facts. See _NOTE_CONVENTION.md."
+    },
+    "rationale": {
+      "type": "string",
+      "minLength": 1,
+      "description": "The WHY behind the decision. Free-form, may be long. Distinct from _note (which is the WHAT)."
+    },
+    "severity": {
+      "type": "string",
+      "enum": ["low", "medium", "high", "critical"]
+    }
+  }
+}

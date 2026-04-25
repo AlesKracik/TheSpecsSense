@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "actor.schema.json",
+  "title": "Round 1 — Actor catalog",
+  "type": "object",
+  "required": ["actors"],
+  "properties": {
+    "$schema": {"type": "string"},
+    "actors": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "name", "permitted_verbs", "_note"],
+        "properties": {
+          "id": {"$ref": "_common.schema.json#/$defs/id"},
+          "name": {"type": "string", "minLength": 1},
+          "permitted_verbs": {
+            "type": "array",
+            "items": {"$ref": "_common.schema.json#/$defs/id"}
+          },
+          "primary_concerns": {
+            "type": "array",
+            "items": {"type": "string"}
+          },
+          "rationale": {"$ref": "_common.schema.json#/$defs/rationale"},
+          "_note": {"$ref": "_common.schema.json#/$defs/note"}
+        }
+      }
+    }
+  }
+}

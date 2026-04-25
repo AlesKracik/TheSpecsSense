@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "contract.schema.json",
+  "title": "Hoare contract per operation",
+  "type": "object",
+  "required": ["id", "operation", "requires", "ensures", "preserves", "_note"],
+  "properties": {
+    "$schema": {"type": "string"},
+    "id": {"$ref": "_common.schema.json#/$defs/id"},
+    "operation": {"$ref": "_common.schema.json#/$defs/id", "description": "Verb ID this contract is for."},
+    "parameters": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "type"],
+        "properties": {
+          "name": {"type": "string"},
+          "type": {"type": "string"}
+        }
+      }
+    },
+    "requires": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["clause", "traces_to"],
+        "properties": {
+          "clause": {"type": "string"},
+          "traces_to": {"type": "array", "minItems": 1, "items": {"$ref": "_common.schema.json#/$defs/id"}}
+        }
+      }
+    },
+    "ensures": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["clause", "traces_to"],
+        "properties": {
+          "clause": {"type": "string"},
+          "traces_to": {"type": "array", "minItems": 1, "items": {"$ref": "_common.schema.json#/$defs/id"}}
+        }
+      }
+    },
+    "preserves": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["invariant"],
+        "properties": {
+          "invariant": {"$ref": "_common.schema.json#/$defs/id"}
+        }
+      }
+    },
+    "rationale": {"$ref": "_common.schema.json#/$defs/rationale"},
+    "_note": {"$ref": "_common.schema.json#/$defs/note"}
+  }
+}

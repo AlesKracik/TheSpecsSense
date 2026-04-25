@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "assumption.schema.json",
+  "title": "Round 8 — Assumption registry",
+  "type": "object",
+  "required": ["assumptions"],
+  "properties": {
+    "$schema": {"type": "string"},
+    "assumptions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "category", "statement", "risk_if_violated", "severity", "mitigation", "referenced_by", "_note"],
+        "properties": {
+          "id": {"$ref": "_common.schema.json#/$defs/id"},
+          "category": {
+            "type": "string",
+            "enum": ["environmental", "data", "human", "organizational", "technological"]
+          },
+          "statement": {"type": "string"},
+          "risk_if_violated": {"type": "string"},
+          "severity": {"$ref": "_common.schema.json#/$defs/severity"},
+          "mitigation": {
+            "type": "string",
+            "enum": ["accept", "transfer", "reduce", "convert_to_requirement"]
+          },
+          "mitigation_detail": {"type": "string"},
+          "referenced_by": {
+            "type": "array",
+            "items": {"$ref": "_common.schema.json#/$defs/id"}
+          },
+          "rationale": {"$ref": "_common.schema.json#/$defs/rationale"},
+          "_note": {"$ref": "_common.schema.json#/$defs/note"}
+        }
+      }
+    }
+  }
+}

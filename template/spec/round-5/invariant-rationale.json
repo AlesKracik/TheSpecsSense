@@ -1,0 +1,4 @@
+{
+  "$schema": "../.ci/schemas/invariant-rationale.schema.json",
+  "invariants": []
+}

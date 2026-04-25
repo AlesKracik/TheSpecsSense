@@ -1,0 +1,4 @@
+{
+  "$schema": "../.ci/schemas/assumption.schema.json",
+  "assumptions": []
+}

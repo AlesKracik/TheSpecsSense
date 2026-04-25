@@ -1,0 +1,4 @@
+{
+  "$schema": "../.ci/schemas/actor.schema.json",
+  "actors": []
+}

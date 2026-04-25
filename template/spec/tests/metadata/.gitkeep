@@ -1,0 +1,3 @@
+Test metadata. One JSON file per test, schema at `../../.ci/schemas/test-metadata.schema.json`.
+Each test references the spec ID(s) it derives from (state cell, partition class, invariant, etc.).
+The traceability check fails CI on (a) tests with no spec reference, (b) spec artifacts with no test reference.

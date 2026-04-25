@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "quality.schema.json",
+  "title": "Round 6 — Quality-attribute matrix",
+  "type": "object",
+  "required": ["qualities"],
+  "properties": {
+    "$schema": {"type": "string"},
+    "qualities": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "quality", "sub_attribute", "applicable", "_note"],
+        "properties": {
+          "id": {"$ref": "_common.schema.json#/$defs/id"},
+          "quality": {
+            "type": "string",
+            "enum": [
+              "security", "performance", "scalability", "availability",
+              "observability", "recoverability", "compliance", "cost",
+              "maintainability", "deprecation", "accessibility", "internationalization"
+            ]
+          },
+          "sub_attribute": {"type": "string"},
+          "applicable": {"type": "boolean"},
+          "target": {"type": "string"},
+          "acceptance_criterion": {"type": "string"},
+          "test_method": {"type": "string"},
+          "rationale_not_applicable": {"type": "string"},
+          "rationale": {"$ref": "_common.schema.json#/$defs/rationale"},
+          "_note": {"$ref": "_common.schema.json#/$defs/note"}
+        },
+        "allOf": [
+          {
+            "if": {"properties": {"applicable": {"const": true}}},
+            "then": {"required": ["target", "acceptance_criterion", "test_method"]}
+          },
+          {
+            "if": {"properties": {"applicable": {"const": false}}},
+            "then": {"required": ["rationale_not_applicable"]}
+          }
+        ]
+      }
+    }
+  }
+}

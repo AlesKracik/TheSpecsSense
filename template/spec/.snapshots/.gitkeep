@@ -1,0 +1,13 @@
+Manual evidence snapshots for sources the fetch-evidence skill cannot reach
+(closed-SaaS dashboards, air-gapped wikis, offline reports).
+
+Layout: one subdirectory per source ID, e.g.
+  .snapshots/grafana-prod-dashboard/panel-p99.png
+  .snapshots/grafana-prod-dashboard/panel-p99.txt    (text excerpt for the agent)
+  .snapshots/grafana-prod-dashboard/last_refreshed   (ISO 8601 timestamp, plain text)
+
+The fetch-evidence skill (../../skills/fetch-evidence.md) checks this directory
+when a source is otherwise unreachable and treats matching content as canonical.
+If `last_refreshed` is older than the project's snapshot TTL (default 90 days),
+the skill returns `staleness_warning: true` for that excerpt and the calling
+agent's `uncertainty` rises accordingly.

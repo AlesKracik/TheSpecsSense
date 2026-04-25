@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "invariant-rationale.schema.json",
+  "title": "Round 5 — Invariant rationale (mirror of invariants.qnt)",
+  "type": "object",
+  "required": ["invariants"],
+  "properties": {
+    "$schema": {"type": "string"},
+    "invariants": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "qnt_name", "kind", "actions_that_could_violate", "_note"],
+        "properties": {
+          "id": {"$ref": "_common.schema.json#/$defs/id"},
+          "qnt_name": {"type": "string", "description": "Identifier in invariants.qnt that names this invariant's predicate."},
+          "kind": {"type": "string", "enum": ["safety", "liveness", "fairness"]},
+          "actions_that_could_violate": {
+            "type": "array",
+            "items": {"$ref": "_common.schema.json#/$defs/id"},
+            "description": "Cell IDs (R2), interaction IDs (R4), or verb IDs (R1) whose execution must be proven to preserve this invariant."
+          },
+          "rationale": {"$ref": "_common.schema.json#/$defs/rationale"},
+          "_note": {"$ref": "_common.schema.json#/$defs/note"}
+        }
+      }
+    }
+  }
+}
