@@ -8,7 +8,7 @@ Read this file fully before doing anything in this repo.
 
 - **Drive one task at a time.** Pick the highest-priority open task, propose a concrete change, get human agreement, validate, commit, open a PR. Then move on.
 - **Don't run a tight loop.** This is interactive collaboration, not unattended dispatch. After each task, pause for human direction.
-- **Don't dispatch sub-agents** for spec content. The agent prompts under `agents/` describe procedures; you execute them inline.
+- **Don't dispatch sub-agents** for spec content. The agent prompts under `spec/agents/` describe procedures; you execute them inline.
 - **Ask before committing.** Always confirm with the human before `git commit`, branch creation, or PR open. Never merge.
 - **Surface uncertainty.** If you're not sure a record matches stakeholder intent, say so before proposing it. The human is the only authority on intent.
 
@@ -39,9 +39,10 @@ If you propose a record without a `_note` or with a dangling reference, CI will 
 | `spec/contracts/<verb-id>.json` | Hoare contract per operation, derived from rounds 1-8. | Contract assembly (after rounds 1-8 stabilize). |
 | `spec/.ci/schemas/*.schema.json` | JSON Schemas for every artifact type. | When unsure of a record's required fields. |
 | `spec/.ci/checks/run_all.sh` | Runs schema + ref-integrity + `_note` + round-2-completeness checks. | **Before every commit.** |
-| `agents/round-*.md` | Per-round procedure documentation. | Read the relevant one when starting a round. The "Output format" sections describe JSON Patch output for an orchestrator-driven flow — in interactive mode, you edit files directly instead. The schema, procedure, and hard-rules sections still apply. |
-| `skills/fetch-evidence.md` | Spec for the `fetch-evidence` capability used in brownfield/mixed mode. | When you need to pull excerpts from code, dashboards, postmortems, etc. |
-| `passes/pass-N.md` | The active pass's progress checklist (round-by-round counters, PR links, blockers, session notes). Aide-memoire only — not authoritative. | **Read at session start** (after AGENTS.md and scope.md). Update as work progresses; verify against the spec before pass closure. See § Progress tracking below. |
+| `spec/agents/round-*.md` | Per-round procedure documentation. | Read the relevant one when starting a round. The "Output format" sections describe JSON Patch output for an orchestrator-driven flow — in interactive mode, you edit files directly instead. The schema, procedure, and hard-rules sections still apply. |
+| `spec/skills/fetch-evidence.md` | Spec for the `fetch-evidence` capability used in brownfield/mixed mode. | When you need to pull excerpts from code, dashboards, postmortems, etc. |
+| `spec/passes/pass-N.md` | The active pass's progress checklist (round-by-round counters, PR links, blockers, session notes). Aide-memoire only — not authoritative. | **Read at session start** (after AGENTS.md and scope.md). Update as work progresses; verify against the spec before pass closure. See § Progress tracking below. |
+| `spec/scripts/init-spec.sh`, `spec/scripts/render-views.py`, `spec/scripts/new-entity.sh` | One-time setup, view rendering, and entity-scaffolding helpers. | When initializing a fresh spec, regenerating views, or scaffolding a new stateful entity. |
 
 ## Deterministic primitives — use these, don't reinvent them
 
@@ -84,14 +85,14 @@ At the start of a session (or when the human asks "what's open?"), walk the spec
 | **6** | A standard quality dimension (security/performance/scalability/availability/observability/recoverability/compliance/cost/maintainability/deprecation/accessibility/internationalization) is not represented in `quality.json`. |
 | **7** | A STRIDE category (spoofing/tampering/repudiation/information_disclosure/denial_of_service/elevation_of_privilege) is not represented in `adversarial.json`, OR new entities introduce attack surface not yet covered. |
 | **8** | A category (environmental/data/human/organizational/technological) hasn't been probed; OR new requirements lack referenced assumptions. |
-| **Cross-pass (R9)** | Cross-round consistency gaps — IDs that one round depends on but another round hasn't fully covered. Two operational shapes: in **pass 1**, walk every round's artifacts and check completeness across them (the `pass-0..HEAD` diff is the whole spec, so the work is a full audit, not a delta scan). In **pass 2+**, focus on what the `git diff <last-pass-tag>..HEAD -- spec/round-*/` shows — new IDs since the last fixed point. Same gap-list output in both cases. See [`agents/round-9-cross-pass-delta.md`](agents/round-9-cross-pass-delta.md) for the per-round rules and the `pass_1_full_audit` vs `pass_n_delta` modes. |
+| **Cross-pass (R9)** | Cross-round consistency gaps — IDs that one round depends on but another round hasn't fully covered. Two operational shapes: in **pass 1**, walk every round's artifacts and check completeness across them (the `pass-0..HEAD` diff is the whole spec, so the work is a full audit, not a delta scan). In **pass 2+**, focus on what the `git diff <last-pass-tag>..HEAD -- spec/round-*/` shows — new IDs since the last fixed point. Same gap-list output in both cases. See [`spec/agents/round-9-cross-pass-delta.md`](agents/round-9-cross-pass-delta.md) for the per-round rules and the `pass_1_full_audit` vs `pass_n_delta` modes. |
 | **Contracts** | A verb in `verbs.json` has no `spec/contracts/<verb-id>.json`. |
 
 When the human says "what's next," report a prioritized list (severity × round number) and let them pick.
 
 ## How to drive a round
 
-For each round you work on, **read the corresponding `agents/round-*.md` first**. It contains:
+For each round you work on, **read the corresponding `spec/agents/round-*.md` first**. It contains:
 
 - The closure condition (when this round is done)
 - The procedure (step-by-step rules)
@@ -223,11 +224,11 @@ A "pass" is one full iteration of the algorithm — Round 1 → Round 8 with cro
 
 Then wait for explicit yes.
 
-## Progress tracking — keep `passes/pass-N.md` current
+## Progress tracking — keep `spec/passes/pass-N.md` current
 
-The current pass's checklist lives at `passes/pass-N.md` (where N is the next pass to be tagged — for the first iteration, that's `pass-1.md`, created by `scripts/init-spec.sh` from `passes/pass-template.md`). It's the running mental model of where the spec stands procedurally — round-by-round checklist, aggregate counters, PR links, blockers, session notes.
+The current pass's checklist lives at `spec/passes/pass-N.md` (where N is the next pass to be tagged — for the first iteration, that's `pass-1.md`, created by `spec/scripts/init-spec.sh` from `spec/passes/pass-template.md`). It's the running mental model of where the spec stands procedurally — round-by-round checklist, aggregate counters, PR links, blockers, session notes.
 
-**Read it first when resuming a session.** After AGENTS.md and `spec/scope.md`, `passes/pass-N.md` is the third file you read at session start. It tells you which round is in flight, which PRs are open, what's blocked.
+**Read it first when resuming a session.** After AGENTS.md and `spec/scope.md`, `spec/passes/pass-N.md` is the third file you read at session start. It tells you which round is in flight, which PRs are open, what's blocked.
 
 **Update it as you work.** Refresh the checklist at these moments:
 - After merging a PR — tick off the relevant items, append the PR URL under that round's section
@@ -239,13 +240,13 @@ The current pass's checklist lives at `passes/pass-N.md` (where N is the next pa
 
 **Don't trust it as truth.** If `pass-N.md` says "Round 4 done" but `interactions.json` is empty, **the spec wins** — fix the checklist. CI does not validate the checklist; it's an aide-memoire only. Better an honest "let me re-check the spec" than a confidently-wrong checklist.
 
-**At pass closure:** before asking the human to tag, walk the **Closure conditions** section and verify each item against the actual spec, not against the checklist's prior state. Then ask for the tag. After the human tags `pass-N`, copy `passes/pass-template.md` → `passes/pass-(N+1).md` (only if iteration continues — i.e., scope revision or new feature is queued) and stamp the new pass's start date and the just-created tag as the new baseline.
+**At pass closure:** before asking the human to tag, walk the **Closure conditions** section and verify each item against the actual spec, not against the checklist's prior state. Then ask for the tag. After the human tags `pass-N`, copy `spec/passes/pass-template.md` → `spec/passes/pass-(N+1).md` (only if iteration continues — i.e., scope revision or new feature is queued) and stamp the new pass's start date and the just-created tag as the new baseline.
 
 ## What NOT to do
 
 - **Don't merge PRs.** Stakeholder review is the only path to merge. Even if the human says "merge it," remind them that CODEOWNERS / branch protection should gate the merge — they can hit the green button themselves after review.
 - **Don't `--no-verify` commits.** If a hook fails, fix the underlying issue.
-- **Don't fabricate `source_evidence`.** In brownfield/mixed mode, every brownfield-derived record must cite a real file:line / URL / postmortem ID. If you can't reach a source, use the `unreachable` pattern from `skills/fetch-evidence.md` rather than guess.
+- **Don't fabricate `source_evidence`.** In brownfield/mixed mode, every brownfield-derived record must cite a real file:line / URL / postmortem ID. If you can't reach a source, use the `unreachable` pattern from `spec/skills/fetch-evidence.md` rather than guess.
 - **Don't modify `scope.md` autonomously.** Scope is human-authored. If you think scope needs revision, raise it: *"this surfaced a gap that suggests scope.md needs `<change>` — want to revise scope (which restarts from Round 1) or add this as an in-scope assumption?"*
 - **Don't tag `pass-N` autonomously.** Always ask first.
 - **Don't run multiple tasks in parallel.** One open PR at a time keeps review tractable. If the human asks for parallelism, push back: parallel dispatches risk Git conflicts on shared files (e.g., two PRs both adding to `interactions.json`) and need a reconciler agent that doesn't yet exist.

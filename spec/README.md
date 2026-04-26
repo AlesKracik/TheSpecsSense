@@ -1,33 +1,32 @@
 # Specs Sense — project template
 
-Copy this folder into the root of a new (or existing) project and start running the algorithm with an LLM as your collaborator. This template is the physical realization of [the algorithm](../docs/its-elementary.md), driven interactively by an LLM under live human direction. Works with any LLM that auto-loads `AGENTS.md` (Cursor, Claude Code, OpenAI Codex, Aider, etc.) or that you can point at the file manually. Stakeholder review still happens via PRs.
+Copy this folder into the root of a new (or existing) project and start running the algorithm with an LLM as your collaborator. This template is the physical realization of [the algorithm](../docs/its-elementary.md), driven interactively by an LLM under live human direction. Stakeholder review still happens via PRs.
+
+The whole template lives under a single `spec/` subtree, so it drops into any repo (spec-only or mixed with code) without polluting the project root.
 
 ## Install
 
 ```bash
-cp -r path/to/this/template/AGENTS.md .
-cp -r path/to/this/template/spec .
-cp -r path/to/this/template/agents .
-cp -r path/to/this/template/skills .          # portable skill specs — runtime location varies
-cp -r path/to/this/template/passes .          # per-pass progress checklists (template + pass-1.md)
-cp -r path/to/this/template/scripts .
-bash scripts/init-spec.sh                     # layout check, deps, pre-commit hook, pass-0 tag, pass-1.md
+cp -r path/to/this/repo/spec ./spec       # one subtree, everything self-contained
+bash spec/scripts/init-spec.sh             # layout check, deps, pre-commit hook, pass-0 tag, pass-1.md
 ```
 
-The `skills/` directory holds **portable spec definitions**, not runtime-loaded files. For Claude Code, symlink each spec into `.claude/skills/`; for the Anthropic SDK or another runtime, you (or your LLM driver) registers them programmatically. See [`skills/_README.md § Where skills live at runtime`](skills/_README.md).
+Then open the repo in your LLM driver (Claude Code, Cursor, Codex, Aider, or any LLM you can point at a file) and tell it: *"Read `spec/AGENTS.md` and start Round 1 against `spec/scope.md`."*
+
+> **Note on auto-loading.** `AGENTS.md` lives at `spec/AGENTS.md`, not at repo root, so tools that auto-load `AGENTS.md` only at root won't pick it up automatically. If you want auto-load on a spec-only repo, drop a 3-line stub `AGENTS.md` at repo root that says "this is a Specs Sense repo; read `spec/AGENTS.md` for driving instructions." For mixed repos, this is a feature — your code's `AGENTS.md` (if any) and the Specs Sense one don't collide.
 
 ## How this template runs
 
-This template **is not a turnkey program.** It's a structured spec store + a set of prompt templates + a `AGENTS.md` that tells an LLM how to drive the algorithm interactively.
+This template **is not a turnkey program.** It's a structured spec store + a set of prompt templates + a `spec/AGENTS.md` that tells an LLM how to drive the algorithm interactively.
 
 ```
    Human ◄─── live conversation ───► LLM driver (Claude Code / Cursor / Codex / Aider / etc.)
                                         │
                                         │ reads
                                         ▼
-                                    AGENTS.md       ◄─── start here
+                                    spec/AGENTS.md       ◄─── start here
                                     spec/scope.md
-                                    agents/round-*.md
+                                    spec/agents/round-*.md
                                         │
                                         │ calls
                                         ▼
@@ -49,7 +48,7 @@ The general loop is: LLM detects open work → proposes one change → human app
 
 ## How to use this template
 
-Three scenarios. Pick the one that matches where you are; the substrate (`spec/`, `agents/`, `skills/`, `scripts/`, `AGENTS.md`) is identical across all three. What changes is the `Mode` field in `spec/scope.md` and which input section of each agent prompt the LLM uses.
+Three scenarios. Pick the one that matches where you are; the substrate is identical across all three (`spec/` subtree). What changes is the `Mode` field in `spec/scope.md` and which input section of each agent prompt the LLM uses.
 
 ### 1. Greenfield mode — cold start from informal requirements
 
@@ -57,9 +56,9 @@ You have a sentence or paragraph describing what you want to build. No code yet.
 
 1. **Write `spec/scope.md`.** This is the single most important input. Set `Mode: greenfield`. Name what's in scope, what's out, the stakeholder panel, and bounded constants for the model checker. Leave the Evidence sources section blank or annotate "n/a — greenfield".
 2. **Optionally seed `spec/glossary.md`** with terms you already know are canonical. Or leave it; the LLM will propose additions via PR as it works.
-3. **Open the repo in your LLM driver** — Claude Code, Cursor, Codex, Aider, or anything else that loads `AGENTS.md` (or that you can manually point at it). The driver auto-loads the instructions. Tell it: *"Start Round 1 against scope.md."*
+3. **Open the repo in your LLM driver** and tell it: *"Read `spec/AGENTS.md` and start Round 1 against `spec/scope.md`."*
 4. **Iterate one task at a time.** The LLM proposes one entity / verb / actor at a time, you approve or correct each, the LLM validates and opens a PR. Move to Round 2 once Round 1 closes.
-5. **Stakeholder PR review** happens out-of-band (GitHub UI, the assigned reviewer per [`AGENTS.md § Reviewer routing`](AGENTS.md)).
+5. **Stakeholder PR review** happens out-of-band (GitHub UI, the assigned reviewer per [`spec/AGENTS.md § Reviewer routing`](AGENTS.md)).
 6. **Tag passes when ready.** When the LLM reports a pass has converged (closure conditions met, Round 9 found no new IDs), it asks you whether to tag — you decide.
 7. **Code generation comes later**, downstream of the spec, via the seven-layer conformance pipeline ([ghosts-in-the-code.md](../docs/ghosts-in-the-code.md)). The spec repo holds the truth; the implementation repo respects it.
 
@@ -67,13 +66,13 @@ You have a sentence or paragraph describing what you want to build. No code yet.
 
 You shipped, code exists, the spec is at a fixed point. Now add a feature.
 
-1. **Flip `scope.md` Mode to `mixed`** (if not already) and fill in the Evidence sources section pointing at the existing codebase, dashboards, runbooks, etc. Freeform markdown — URLs, paths, query examples, one-line annotations.
+1. **Flip `spec/scope.md` Mode to `mixed`** (if not already) and fill in the Evidence sources section pointing at the existing codebase, dashboards, runbooks, etc. Freeform markdown — URLs, paths, query examples, one-line annotations.
 2. **Decide: scope revision, or just add R₀?**
    - If the feature fits inside the existing scope, just add the new requirement text. No further `scope.md` edit.
    - If the feature changes scope (new actor type, new domain, new compliance regime), formally revise `scope.md` and log the revision in its table. This exits the main loop per "Scope revision as meta-loop"; you re-enter Round 1 with the revised scope.
 3. **Tell the LLM** *"We're in mixed mode. The new feature is `<text>`. Existing relevant code lives at `<paths>`. Walk Round 1 — propose deltas only, don't disturb existing entries unless the feature requires it."* The LLM walks both the GREENFIELD INPUT (your text) and BROWNFIELD INPUT (existing artifacts + code) sections of the agent prompt and reconciles in conversation.
 4. **Run rounds 2-8 only on the delta.** New stateful entities get fresh matrices; existing entities get new event columns where the feature introduces new triggers. Skip rounds the feature does not touch.
-5. **Round 9 does the heavy lifting.** New material almost always exposes gaps in old rounds. Tell the LLM *"Run cross-pass between `pass-N` and HEAD; report what new IDs need to land in earlier rounds."* It dispatches follow-up tasks for each.
+5. **Round 9 does the heavy lifting.** New material almost always exposes gaps in old rounds. Tell the LLM *"Run cross-pass between `pass-N` and HEAD; report what new IDs need to land in earlier rounds."* It walks the procedure in `spec/agents/round-9-cross-pass-delta.md` and reports gaps for follow-up.
 6. **Conformance pipeline drift gate** still applies — see [ghosts-in-the-code.md](../docs/ghosts-in-the-code.md) for how downstream code re-review gets triggered when spec clauses change.
 
 ### 3. Brownfield mode — extract a spec from an existing codebase
@@ -104,9 +103,12 @@ From the second commit of any project onward, the realistic mode is `mixed`. Pur
 
 ## What's in here
 
+All paths are project-root-relative — i.e., what you'd type from your project's top-level directory after `cp -r .../spec ./spec`.
+
 | Path | Purpose |
 |---|---|
-| `AGENTS.md` | **The driving instructions for the LLM.** Auto-loaded by AGENTS.md-aware drivers (Cursor, Claude Code, Codex, Aider, etc.); readable by any LLM you can point at this file. Defines the role, layout, primitives, per-round procedure, commit/PR conventions, reviewer routing, mode awareness, and what NOT to do. **Read this first.** |
+| `spec/AGENTS.md` | **The driving instructions for the LLM.** Defines the role, layout, primitives, per-round procedure, commit/PR conventions, reviewer routing, mode awareness, and what NOT to do. **Read this first.** |
+| `spec/README.md` | This file. |
 | `spec/scope.md` | Prose declaration of Mode + what is in / out of scope + stakeholder panel + bounded constants + Evidence sources. Human-authored. The single most important input. |
 | `spec/glossary.md` | Shared vocabulary. Human-curated, but the LLM proposes additions via PR. |
 | `spec/round-1/` | Entities, verbs, actors. JSON. |
@@ -119,19 +121,19 @@ From the second commit of any project onward, the realistic mode is `mixed`. Pur
 | `spec/round-8/` | Assumption registry. JSON. |
 | `spec/contracts/` | One Hoare contract file per operation. JSON. Derived from rounds 1-8. |
 | `spec/tests/` | Test metadata and source. Each test references the spec ID it derives from. |
+| `spec/agents/` | Per-round procedure documentation. The LLM reads these as reference when starting a round. |
+| `spec/skills/` | Reusable capabilities the LLM invokes during reasoning (e.g. `fetch-evidence` for brownfield/mixed source resolution). |
+| `spec/passes/` | Per-pass progress checklists — the running mental model of where the spec stands procedurally. `pass-template.md` is frozen; `pass-1.md` (created by `init-spec.sh`) and subsequent `pass-N.md` files track round-by-round progress, PR links, blockers, and session notes. **Aide-memoire only — not authoritative.** See [`passes/_README.md`](passes/_README.md). |
+| `spec/scripts/` | `init-spec.sh` (one-time setup), `render-views.py` (regenerate views), `new-entity.sh` (scaffold round-1 + round-2 stubs for a new stateful entity). |
 | `spec/.diff-context/` | Tier-3 PR annotations. Auto-generated by pre-commit hook. |
 | `spec/.snapshots/` | Manual evidence snapshots for sources the `fetch-evidence` skill cannot reach (closed-SaaS dashboards, air-gapped wikis). Gitignored by default. |
 | `spec/.ci/schemas/` | JSON Schema files for every artifact type. |
 | `spec/.ci/checks/` | CI scripts: schema validation, referential integrity, `_note` consistency, Round-2 completeness. **Run before every commit.** |
-| `spec/.views/rendered/` | Auto-generated markdown views for human reading. Never edit by hand; regenerate via `scripts/render-views.py`. |
-| `agents/` | Per-round procedure documentation. The LLM reads these as reference when starting a round. |
-| `skills/` | Reusable capabilities the LLM invokes during reasoning (e.g. `fetch-evidence` for brownfield/mixed source resolution). |
-| `passes/` | Per-pass progress checklists — the running mental model of where the spec stands procedurally. `pass-template.md` is frozen; `pass-1.md` (created by `init-spec.sh`) and subsequent `pass-N.md` files track round-by-round progress, PR links, blockers, and session notes. **Aide-memoire only — not authoritative.** See [`passes/_README.md`](passes/_README.md). |
-| `scripts/` | `init-spec.sh` (one-time setup), `render-views.py` (regenerate views), `new-entity.sh` (scaffold round-1 + round-2 stubs for a new stateful entity). |
+| `spec/.views/rendered/` | Auto-generated markdown views for human reading. Never edit by hand; regenerate via `spec/scripts/render-views.py`. |
 
 ## The two non-negotiables
 
-1. **`_note` on every record.** Every meaningful record carries a 40-300 character human-language rendering of its content. CI rejects records without it. See [`spec/.ci/_NOTE_CONVENTION.md`](spec/.ci/_NOTE_CONVENTION.md).
+1. **`_note` on every record.** Every meaningful record carries a 40-300 character human-language rendering of its content. CI rejects records without it. See [`spec/.ci/_NOTE_CONVENTION.md`](.ci/_NOTE_CONVENTION.md).
 2. **Stable IDs everywhere.** Every entity, cell, partition, invariant, scenario, assumption, contract, test, and diff-context entry has an ID. The referential-integrity checker (`spec/.ci/checks/check_referential_integrity.py`) fails CI when an ID is referenced but not defined.
 
 ## Running CI locally
@@ -147,10 +149,10 @@ This runs:
 - Round-2 completeness check (no empty cells)
 - Quint model checker on `round-5/invariants.qnt` (if `quint` is installed)
 
-Wire it into your CI provider as a single step. PRs that fail any check are blocked from merge. The LLM (per `AGENTS.md`) runs this locally before every commit it proposes.
+Wire it into your CI provider as a single step. PRs that fail any check are blocked from merge. The LLM (per `spec/AGENTS.md`) runs this locally before every commit it proposes.
 
 ## What this template does NOT include
 
-- **An automated orchestrator.** The previous version of this template included one; it's been replaced with the LLM-driven flow described in `AGENTS.md`. If you want unattended dispatch (cron-driven, multi-task fan-out, PR-event-driven re-dispatch), you'll need to write your own orchestrator — the spec layout, agent prompts, skills, and CI checks are designed to be reusable across drivers.
+- **An automated orchestrator.** The previous version of this template included one; it's been replaced with the LLM-driven flow described in `spec/AGENTS.md`. If you want unattended dispatch (cron-driven, multi-task fan-out, PR-event-driven re-dispatch), you'll need to write your own orchestrator — the spec layout, agent prompts, skills, and CI checks are designed to be reusable across drivers.
 - **Conformance pipeline.** The seven-layer downstream pipeline ([ghosts-in-the-code.md](../docs/ghosts-in-the-code.md)) lives in your implementation repo, not the spec repo. Hooks for traceability metadata are stubbed in `spec/tests/` but the runtime/type/property-test layers are language-specific.
-- **Reviewer assignment automation.** Use a `.github/CODEOWNERS` file mapping `spec/round-1/*` etc. to your stakeholder GitHub handles — that's what gets reviewers auto-requested on PRs. The `AGENTS.md` reviewer-routing table tells the LLM which stakeholder to mention in PR bodies; CODEOWNERS makes the actual review-request happen.
+- **Reviewer assignment automation.** Use a `.github/CODEOWNERS` file mapping `spec/round-1/*` etc. to your stakeholder GitHub handles — that's what gets reviewers auto-requested on PRs. The `spec/AGENTS.md` reviewer-routing table tells the LLM which stakeholder to mention in PR bodies; CODEOWNERS makes the actual review-request happen.

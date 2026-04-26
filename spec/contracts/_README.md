@@ -25,4 +25,4 @@ The referential-integrity check (`../.ci/checks/check_referential_integrity.py`)
 
 ## Bootstrapping
 
-This directory is empty until rounds 1-8 have produced enough material to assemble contracts from. The contract-assembly agent (`agents/contract-assembly.md`) creates one file per verb on dispatch.
+This directory is empty until rounds 1-8 have produced enough material to assemble contracts from. The contract-assembly agent (`spec/agents/contract-assembly.md`) creates one file per verb on dispatch.

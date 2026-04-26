@@ -7,14 +7,10 @@
 # Spec store local snapshots (manual evidence captures; may contain sensitive data)
 spec/.snapshots/*
 !spec/.snapshots/.gitkeep
-template/spec/.snapshots/*
-!template/spec/.snapshots/.gitkeep
 
 # Auto-generated views — regenerated from JSON on every commit, never authored
 spec/.views/rendered/*
 !spec/.views/rendered/.gitkeep
-template/spec/.views/rendered/*
-!template/spec/.views/rendered/.gitkeep
 
 # Python
 __pycache__/

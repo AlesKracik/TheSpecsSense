@@ -11,7 +11,7 @@ This directory tracks the **procedural state** of each algorithm pass — what's
 
 ## Lifecycle
 
-1. **Init.** `scripts/init-spec.sh` copies `pass-template.md` → `pass-1.md` and stamps the start date + scope.md commit SHA.
+1. **Init.** `spec/scripts/init-spec.sh` copies `pass-template.md` → `pass-1.md` and stamps the start date + scope.md commit SHA.
 2. **As work progresses.** The LLM driver (per [`AGENTS.md`](../AGENTS.md)) updates the active pass file:
    - Ticks off completed checklist items
    - Updates aggregate counters ("Matrices created: 3 / 5")

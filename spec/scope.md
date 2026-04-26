@@ -2,7 +2,7 @@
 
 > **This file is human-authored. Agents may read it but must not modify it.**
 > Scope is the input the algorithm takes; it cannot bootstrap its own purpose.
-> Revising scope is a meta-decision that exits the main loop. See [its-elementary.md § Scope revision as meta-loop](../../docs/its-elementary.md).
+> Revising scope is a meta-decision that exits the main loop. See [its-elementary.md § Scope revision as meta-loop](../docs/its-elementary.md).
 
 > **DELETE-ME — how to use this file:** every section below has a `DELETE-ME — guidance` blockquote and a `TODO` placeholder. Replace each `TODO` with real content, then delete the matching guidance blockquote. Search the file for `DELETE-ME` to find anything still pending.
 

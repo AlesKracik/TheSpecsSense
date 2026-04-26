@@ -1,6 +1,6 @@
 # Skills
 
-Skills are reusable capabilities the LLM invokes during its reasoning — function-call style. Distinct from the round-N procedures in `agents/`: a procedure is a complete reasoning task whose output goes through PR review; a skill is a focused service the LLM calls inline when it needs a specific result (fetching evidence, looking up an ID, validating a schema).
+Skills are reusable capabilities the LLM invokes during its reasoning — function-call style. Distinct from the round-N procedures in `spec/agents/`: a procedure is a complete reasoning task whose output goes through PR review; a skill is a focused service the LLM calls inline when it needs a specific result (fetching evidence, looking up an ID, validating a schema).
 
 > **Note on terminology.** This file was written for an orchestrator-dispatched flow where each round was a separate LLM agent invocation. **In this template's current default flow, there is no orchestrator and no separate agent process** — the LLM driven by [`../AGENTS.md`](../AGENTS.md) executes round procedures interactively. When the text below says "agents invoke skills," read it as "the driver LLM invokes skills." Skills themselves are unchanged: same definitions, same input/output, same registration pattern with whatever runtime is hosting the LLM.
 
@@ -45,14 +45,14 @@ The files in this directory are **portable spec definitions** — provider-agnos
 | **LangChain / LangGraph** | Wrap as a `Tool` subclass; pass as `tools` to the agent | Standard tool-passing |
 | **Custom orchestrator** | Wherever your orchestrator looks | Per your design |
 
-For **Claude Code** specifically, the simplest path is to symlink or copy each spec into `.claude/skills/` so Claude Code's native `Skill` tool finds them by name:
+For **Claude Code** specifically, the simplest path is to symlink or copy each spec into `.claude/skills/` (at project root) so Claude Code's native `Skill` tool finds them by name. Run from project root:
 
 ```bash
 mkdir -p .claude/skills
-ln -sf ../../skills/fetch-evidence.md .claude/skills/
+ln -sf ../../spec/skills/fetch-evidence.md .claude/skills/
 # repeat per skill as the directory grows
 ```
 
-For other runtimes, the orchestrator's responsibility includes **translating these specs into the runtime's registration format**. The portable spec stays in `skills/` as the canonical source of truth; per-runtime adapters in the orchestrator generate the function-call JSON, the `tools=[...]` argument, the LangChain `Tool` subclass, etc., from the same Markdown source.
+For other runtimes, the orchestrator's responsibility includes **translating these specs into the runtime's registration format**. The portable spec stays in `spec/skills/` as the canonical source of truth; per-runtime adapters in the orchestrator generate the function-call JSON, the `tools=[...]` argument, the LangChain `Tool` subclass, etc., from the same Markdown source.
 
 The skill spec itself is intentionally Markdown rather than JSON — humans review it, agents read it as their skill description, and orchestrators parse the structured sections (Inputs, Output, Tool requirements) for runtime registration. Same source, three audiences.

@@ -11,7 +11,7 @@ Every agent must obey the **agent contract** from [behind-the-curtain.md § Agen
 1. **Narrow scope.** Do exactly the task asked. Do not range further.
 2. **Bounded context.** Only the slice provided. Do not request more files.
 3. **Structured output.** JSON conforming to the schema(s) named in the prompt. Use the LLM provider's structured-output / JSON-mode API where available.
-4. **Faithful `_note`.** Every record includes a 40-300 char `_note` matching the data. See [_NOTE_CONVENTION.md](../spec/.ci/_NOTE_CONVENTION.md).
+4. **Faithful `_note`.** Every record includes a 40-300 char `_note` matching the data. See [_NOTE_CONVENTION.md](../.ci/_NOTE_CONVENTION.md).
 5. **Uncertainty flag.** Each PR carries `uncertainty: low | medium | high` so the orchestrator can route high-uncertainty work to a human reviewer first.
 6. **No hidden state.** Everything you need is in the prompt; everything you produce goes to a PR.
 
