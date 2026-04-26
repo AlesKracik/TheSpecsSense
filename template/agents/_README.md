@@ -1,6 +1,10 @@
 # Agent prompt templates
 
-Each file is a self-contained prompt template the orchestrator passes to an LLM agent for one narrow task. The orchestrator substitutes `{{...}}` placeholders with concrete values before dispatch.
+Each file is a self-contained prompt template describing one round's procedure: scope, inputs, schema, hard rules, and (where applicable) tool requirements.
+
+> **Note on terminology.** These prompts were written for an orchestrator-dispatched flow and use "orchestrator" / "agent invocation" throughout. **In this template's current default flow, there is no orchestrator process** — an LLM driven by [`../AGENTS.md`](../AGENTS.md) executes the procedures interactively under live human direction. When you read "the orchestrator dispatches X" or "the agent invocation," substitute "the LLM driver picks the next task and applies this procedure inline." When you read "Output format: a JSON object with `{uncertainty, patch, rationale_for_pr_body}`," that's the orchestrator-mode artifact — in interactive mode, the LLM `Edit`s the target file directly and writes the rationale into the PR body. The **schema, hard rules, and `_note` conventions still apply** regardless of driver.
+
+Each prompt template — and each invocation, when an orchestrator dispatches one — substitutes `{{...}}` placeholders with concrete values before use.
 
 Every agent must obey the **agent contract** from [behind-the-curtain.md § Agent contract](../../docs/behind-the-curtain.md):
 

@@ -1,6 +1,8 @@
 # Skills
 
-Skills are reusable capabilities that **agents invoke during their reasoning** — function-call style. They are distinct from agents themselves: an agent is a complete LLM invocation with its own prompt and structured output that goes through PR review; a skill is a focused service the agent calls inline when it needs a specific result.
+Skills are reusable capabilities the LLM invokes during its reasoning — function-call style. Distinct from the round-N procedures in `agents/`: a procedure is a complete reasoning task whose output goes through PR review; a skill is a focused service the LLM calls inline when it needs a specific result (fetching evidence, looking up an ID, validating a schema).
+
+> **Note on terminology.** This file was written for an orchestrator-dispatched flow where each round was a separate LLM agent invocation. **In this template's current default flow, there is no orchestrator and no separate agent process** — the LLM driven by [`../AGENTS.md`](../AGENTS.md) executes round procedures interactively. When the text below says "agents invoke skills," read it as "the driver LLM invokes skills." Skills themselves are unchanged: same definitions, same input/output, same registration pattern with whatever runtime is hosting the LLM.
 
 ## Skills vs agents
 
