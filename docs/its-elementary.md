@@ -49,11 +49,14 @@ For each stateful entity, exhaustively specify the transition behavior under eve
 6. Review: for each "impossible by construction" cell, verify the invariant that makes it impossible is actually enforced elsewhere.
 
 ### Closure condition
-Zero empty cells. Every "impossible" claim is backed by an explicit enforcement mechanism.
+Zero empty cells. Every "impossible" claim is backed by an explicit enforcement mechanism. The Quint module for the entity typechecks.
 
 ### Artifacts produced
-- One state-event matrix per stateful entity
-- A transition table: (state, event) → (next_state, guard, actions, output_events)
+- One **Quint module** per stateful entity (`<entity-id>.qnt`) declaring `type State`, `var`s, `init`, and one guarded `action handle_<event>` per declared event. This is the authoritative state machine.
+- One JSON companion (`<entity-id>-notes.json`) carrying per-cell `_note`, rationale, source evidence, uncertainty, and `justification_ref` for `impossible` cells — every field Quint cannot enforce.
+- Together these realize the transition table: (state, event) → (next_state, guard, actions, output_events). The first three live in Quint; the prose and provenance live in JSON.
+
+This is the substrate Round 5 model-checks. Round 5 `import`s these modules and adds `val` invariants over them — it does not re-declare state. The boundary is enforced by review: Round 5 PRs may only edit `val`, `import`, and `allInvariants`.
 
 ### Hoare-logic interpretation
 Each non-empty cell is a triple:
@@ -140,8 +143,11 @@ Express system-wide properties that must hold across all states and transitions,
 ### Closure condition
 Zero counterexamples from the model checker within the declared scope bounds. Every invariant has an explicit list of actions that must preserve it.
 
+### Layer rule — Round 5 owns invariants, Round 2 owns state
+The Round 5 file (`invariants.qnt`) `import`s the per-entity Quint modules produced in Round 2. Round 5 declares `val` predicates and the `allInvariants` conjunction, and may edit `init`/`step` only as **compositional glue** that stitches the imported modules' actions together (e.g. `step = any { Foo::step, Bar::step }`). Round 5 must not introduce new `var`, new `type`, or new `action` declarations. If a property requires state that Round 2 has not declared, the work is a Round 2 PR, not a Round 5 PR. This split has two payoffs: state vocabulary cannot drift between rounds (there is only one declaration), and review audiences cleanly separate — Round 2 reviewers (domain experts) judge lifecycle correctness, Round 5 reviewers (architects, formal-methods readers) judge safety/liveness.
+
 ### Artifacts produced
-- Formal specification file
+- Formal specification file (`invariants.qnt`) declaring `val` predicates and `allInvariants`, plus `import`s of every Round 2 entity module
 - Invariant list with proof obligations
 - Model-checker configuration and result log
 

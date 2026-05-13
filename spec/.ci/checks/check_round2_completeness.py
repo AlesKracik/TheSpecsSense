@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 """
-Round 2 closure check: every (state, event) cell in every state-machine.json
+Round 2 closure check: every (state, event) cell in every notes companion
 is filled (kind in {transition, noop, impossible}).
+
+Globs both `*-notes.json` (the post-split filename) and `*-state-machine.json`
+(legacy) so the check spans the migration.
 
 Exit code: 0 if every matrix is complete, 1 otherwise.
 """
@@ -23,7 +26,8 @@ def main() -> int:
         print("INFO — round-2/ does not exist; skipping.")
         return 0
 
-    for path in sorted(ROUND2.glob("*-state-machine.json")):
+    candidates = sorted(set(ROUND2.glob("*-notes.json")) | set(ROUND2.glob("*-state-machine.json")))
+    for path in candidates:
         with path.open("r", encoding="utf-8") as f:
             try:
                 data = json.load(f)

@@ -38,7 +38,7 @@ For `pass_n_delta` only:
 3. **For each ID referenced but not defined**, that's a hard gap — but the referential-integrity CI check (`spec/.ci/checks/check_referential_integrity.py`) catches those at commit time. If you find one here, something slipped through CI; flag it.
 4. **For each ID defined but not fully covered**, that's the soft cross-round gap Round 9 specializes in. Walk Round {{N}}'s perspective:
    - **Round 1** — does each entity have attributes (no `attributes: []`)? Does every verb have subject + object that resolve? Does every actor have at least one `permitted_verbs` entry?
-   - **Round 2** — does every stateful entity in `entities.json` (kind=stateful) have a corresponding `<entity-id>-state-machine.json`? Within each matrix, does every (state, event) cell have an entry (transition / noop / impossible)?
+   - **Round 2** — does every stateful entity in `entities.json` (kind=stateful) have BOTH a `<entity-id>.qnt` module AND a `<entity-id>-notes.json` companion? Does `quint typecheck` pass on the `.qnt`? Within each matrix, does every (state, event) cell have an entry (transition / noop / impossible), and does each cell have a matching `handle_<event>` branch in the `.qnt`?
    - **Round 3** — does every verb parameter and every entity attribute that's a value type have a `<dimension>-partition.json`?
    - **Round 4** — has every entity pair that could meaningfully interact been examined? Pairs explicitly marked `family: independent` count as covered.
    - **Round 5** — does every entity in `entities.json` appear in the Quint module's state declarations? Does every stateful action have an invariant constraining it?
@@ -65,7 +65,7 @@ Same shape regardless of mode:
     {
       "round_owing": {{N}},
       "trigger_id": "<the ID that surfaced this gap>",
-      "gap_description": "What is missing — e.g. 'E.AUDIT_LOG referenced by Round 7 mitigation ADV7.STRIDE_S.session_hijack but not in entities.json' or 'no state-machine.json for stateful entity E.SESSION'.",
+      "gap_description": "What is missing — e.g. 'E.AUDIT_LOG referenced by Round 7 mitigation ADV7.STRIDE_S.session_hijack but not in entities.json' or 'no round-2 .qnt+notes pair for stateful entity E.SESSION'.",
       "follow_up_agent": "round-X-<name>",
       "follow_up_inputs": { ... key inputs the driver would need to pass ... }
     }

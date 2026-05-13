@@ -55,8 +55,20 @@ def render_round_1() -> str:
 
 
 def render_round_2() -> str:
-    out = ["# Round 2 — State-event matrices\n"]
-    for path in sorted((SPEC / "round-2").glob("*-state-machine.json")):
+    out = ["# Round 2 — State machines\n"]
+    out.append(
+        "_The authoritative state machine for each entity lives in "
+        "`spec/round-2/<entity>.qnt`. This table is rendered from the "
+        "`<entity>-notes.json` companion; `next_state` may be absent for cells "
+        "whose authoritative form is the Quint branch — read the `.qnt` for ground truth._\n"
+    )
+    # Glob both names so legacy `*-state-machine.json` matrices still render
+    # while a project completes the migration.
+    paths = sorted(
+        set((SPEC / "round-2").glob("*-notes.json"))
+        | set((SPEC / "round-2").glob("*-state-machine.json"))
+    )
+    for path in paths:
         data = read_json(path) or {}
         entity = data.get("entity", "?")
         states = data.get("states", [])
@@ -74,7 +86,8 @@ def render_round_2() -> str:
                 if c is None:
                     row.append("⚠️ open")
                 elif c.get("kind") == "transition":
-                    row.append(f"→ {c.get('next_state')}")
+                    nxt = c.get("next_state")
+                    row.append(f"→ {nxt}" if nxt else "transition (.qnt)")
                 elif c.get("kind") == "noop":
                     row.append("noop")
                 else:

@@ -28,10 +28,10 @@ If you propose a record without a `_note` or with a dangling reference, CI will 
 | `spec/scope.md` | Human-authored Mode (greenfield/brownfield/mixed) + scope + stakeholder panel + bounded constants + Evidence sources. | **Always — first thing you read in any session.** |
 | `spec/glossary.md` | Canonical vocabulary; banned synonyms. | When proposing entity/verb/actor names; check for duplicates. |
 | `spec/round-1/{entities,verbs,actors}.json` | Universe catalog. | Round 1 work; also as the source-of-truth for ID validity in all later rounds. |
-| `spec/round-2/<entity-id>-state-machine.json` | One state-event matrix per stateful entity. | Round 2 work; one file per entity in `entities.json` with `kind: "stateful"`. |
+| `spec/round-2/<entity-id>.qnt` + `<entity-id>-notes.json` | Per-stateful-entity Quint state machine + JSON companion (per-cell `_note`, evidence, rationale, uncertainty). The `.qnt` is authoritative for states/events/actions; the notes are authoritative for everything Quint can't enforce. | Round 2 work; one pair per entity in `entities.json` with `kind: "stateful"`. |
 | `spec/round-3/<dim-id>-partition.json` | One partition file per input dimension. | Round 3 work; dimensions come from verb parameters and entity attributes. |
 | `spec/round-4/interactions.json` | Cross-product entity-pair interactions. | Round 4 work. |
-| `spec/round-5/invariants.qnt` + `invariant-rationale.json` | Quint formal invariants + their _note + rationale. | Round 5 work. |
+| `spec/round-5/invariants.qnt` + `invariant-rationale.json` | Quint formal invariants + their _note + rationale. **`invariants.qnt` `import`s every Round 2 `.qnt` module**; Round 5 declares `val`s and `allInvariants`, may edit `init`/`step` as compositional glue across imports, but never adds new `var`/`type`/`action` declarations. | Round 5 work. |
 | `spec/round-5/traces/*.txt` | Quint counterexample traces awaiting interpretation. | When `quint verify` produced a counterexample. |
 | `spec/round-6/quality.json` | Quality-attribute matrix. | Round 6 work. |
 | `spec/round-7/adversarial.json` | STRIDE scenarios + mitigations. | Round 7 work. |
@@ -61,10 +61,13 @@ python spec/.ci/checks/check_round2_completeness.py
 # Regenerate human-readable views from JSON sources
 python scripts/render-views.py
 
-# Scaffold a new stateful entity (round-1 stub + round-2 state-machine.json)
+# Scaffold a new stateful entity (round-2 .qnt module + notes companion)
 bash scripts/new-entity.sh E.YOUR_ENTITY YourEntityName "STATE_A STATE_B STATE_C"
 
-# Quint type-check / model-check (Round 5)
+# Quint type-check (Round 2 state machines)
+quint typecheck spec/round-2/*.qnt
+
+# Quint type-check / model-check (Round 5 — imports the Round 2 modules)
 quint typecheck spec/round-5/invariants.qnt
 quint verify --invariant=allInvariants spec/round-5/invariants.qnt
 ```
@@ -78,10 +81,10 @@ At the start of a session (or when the human asks "what's open?"), walk the spec
 | Round | Open work exists when... |
 |---|---|
 | **1** | Any of `entities/verbs/actors.json` has `[]`, OR `scope.md` has been modified since the last `pass-N` git tag. |
-| **2** | `entities.json` has stateful entries without a corresponding `round-2/<id>-state-machine.json`, OR an existing matrix has empty `(state, event)` cells (`check_round2_completeness.py` reports them). |
+| **2** | `entities.json` has stateful entries without a corresponding `round-2/<id>.qnt` + `<id>-notes.json` pair, OR an existing matrix has empty `(state, event)` cells (`check_round2_completeness.py` reports them), OR `quint typecheck` fails on any `round-2/*.qnt`, OR an event has a `.qnt` branch without a notes record (or vice versa). |
 | **3** | A verb parameter or entity attribute has no corresponding `round-3/<dim>-partition.json`. |
 | **4** | An entity pair from `entities.json` is not represented in `interactions.json` (neither as a specified interaction nor explicitly marked `family: independent`). |
-| **5** | New entities/events in rounds 1-2 not represented in `invariants.qnt` state, OR `round-5/traces/*.txt` exists awaiting interpretation. |
+| **5** | A property in scope isn't expressed as a `val` in `invariants.qnt`, OR `round-5/traces/*.txt` exists awaiting interpretation. (R5 no longer owns state; if state is missing, that's a Round 2 task — file it there.) |
 | **6** | A standard quality dimension (security/performance/scalability/availability/observability/recoverability/compliance/cost/maintainability/deprecation/accessibility/internationalization) is not represented in `quality.json`. |
 | **7** | A STRIDE category (spoofing/tampering/repudiation/information_disclosure/denial_of_service/elevation_of_privilege) is not represented in `adversarial.json`, OR new entities introduce attack surface not yet covered. |
 | **8** | A category (environmental/data/human/organizational/technological) hasn't been probed; OR new requirements lack referenced assumptions. |
@@ -236,7 +239,7 @@ The current pass's checklist lives at `spec/passes/pass-N.md` (where N is the ne
 - When a blocker emerges — record it in the **Blockers** section so the human sees it
 - When you observe something noteworthy that won't fit elsewhere — append to **Session notes** with a date stamp
 
-**Keep aggregate counters honest.** When the checklist says "Matrices created: 3 / 5", verify before updating: `ls spec/round-2/*-state-machine.json | wc -l` for the numerator, count of `kind: stateful` entries in `entities.json` for the denominator. Don't increment from memory.
+**Keep aggregate counters honest.** When the checklist says "Matrices created: 3 / 5", verify before updating: `ls spec/round-2/*-notes.json | wc -l` for the numerator (paired with a matching `<entity>.qnt`), count of `kind: stateful` entries in `entities.json` for the denominator. Don't increment from memory.
 
 **Don't trust it as truth.** If `pass-N.md` says "Round 4 done" but `interactions.json` is empty, **the spec wins** — fix the checklist. CI does not validate the checklist; it's an aide-memoire only. Better an honest "let me re-check the spec" than a confidently-wrong checklist.
 

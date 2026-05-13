@@ -1,7 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "state-machine.schema.json",
-  "title": "Round 2 — State-event matrix",
+  "title": "Round 2 — State-event matrix (notes companion)",
+  "description": "Schema for the per-entity notes JSON (e.g. round-2/<entity-id>-notes.json) that accompanies the authoritative Quint state machine in round-2/<entity-id>.qnt. The transition shape (next_state/guard/actions/output_events) lives in the .qnt; this file carries _note, rationale, source_evidence, uncertainty, and justification_ref — the fields Quint cannot enforce. The legacy transition fields remain accepted as optional prose mirrors during migration but are no longer authoritative.",
   "type": "object",
   "required": ["entity", "states", "events", "cells"],
   "properties": {
@@ -27,19 +28,17 @@
           "state": {"type": "string"},
           "event": {"type": "string"},
           "kind": {"type": "string", "enum": ["transition", "noop", "impossible"]},
-          "next_state": {"type": "string"},
-          "guard": {"type": "string"},
-          "actions": {"type": "array", "items": {"type": "string"}},
-          "output_events": {"type": "array", "items": {"type": "string"}},
+          "next_state": {"type": "string", "description": "Optional prose mirror of the .qnt transition. Authoritative form is the Quint branch."},
+          "guard": {"type": "string", "description": "Optional prose mirror of the .qnt guard. Authoritative form is the Quint branch."},
+          "actions": {"type": "array", "items": {"type": "string"}, "description": "Optional prose mirror of the .qnt action effects. Authoritative form is the Quint branch."},
+          "output_events": {"type": "array", "items": {"type": "string"}, "description": "Optional prose mirror of the .qnt action's output events. Authoritative form is the Quint branch."},
           "justification_ref": {"$ref": "_common.schema.json#/$defs/id", "description": "Required when kind == 'impossible'. References the invariant or mechanism that makes this cell unreachable."},
           "rationale": {"$ref": "_common.schema.json#/$defs/rationale"},
+          "source_evidence": {"type": "string", "description": "Required in brownfield/mixed mode. file:line citation for where this cell's behavior is realized in code."},
+          "uncertainty": {"type": "string", "enum": ["low", "medium", "high"]},
           "_note": {"$ref": "_common.schema.json#/$defs/note"}
         },
         "allOf": [
-          {
-            "if": {"properties": {"kind": {"const": "transition"}}},
-            "then": {"required": ["next_state"]}
-          },
           {
             "if": {"properties": {"kind": {"const": "impossible"}}},
             "then": {"required": ["justification_ref"]}

@@ -22,14 +22,18 @@
 PRs:
 - _(append as opened: `#NN — entities · @reviewer · merged|open|needs-rework`)_
 
-## Round 2 — State-event matrices
+## Round 2 — State machines
 
 Aggregate counters:
 - Total stateful entities (kind=stateful in entities.json): **___**
-- State-machine.json files created: **___ / ___**
+- `<entity>.qnt` modules created: **___ / ___**
+- `<entity>-notes.json` companions created: **___ / ___**
 - Matrices with all cells filled (transition / noop / impossible): **___ / ___**
 
+- [ ] `quint typecheck spec/round-2/*.qnt` exits 0 for every file
 - [ ] `python spec/.ci/checks/check_round2_completeness.py` exits 0
+- [ ] Every `handle_<event>` branch in every `.qnt` has a matching cell record in the companion notes file (manual check until CI lands)
+- [ ] Every cell record names an event the `.qnt` handles (no orphan notes)
 - [ ] Every "impossible" cell has a real `justification_ref` resolving to an invariant or other artifact
 
 PRs:
@@ -63,8 +67,9 @@ Aggregate counters:
 - Each has matching rationale entry in `invariant-rationale.json`: [ ]
 - Open counterexample traces in `round-5/traces/`: **___**
 
-- [ ] `quint typecheck spec/round-5/invariants.qnt` passes
+- [ ] `quint typecheck spec/round-5/invariants.qnt` passes (including its `import`s of every Round 2 `.qnt`)
 - [ ] `quint verify --invariant=allInvariants spec/round-5/invariants.qnt` produces no counterexamples within bounded scope
+- [ ] **Layer boundary holds:** `python spec/.ci/checks/check_round5_layer_boundary.py` exits 0. (No `spec/round-5`-labelled PR added new `var`/`type`/`action` declarations; only `val`/`import`/`allInvariants`/comments plus compositional `init`/`step` edits are permitted. State changes go through a Round 2 PR.)
 
 PRs:
 - _(append)_

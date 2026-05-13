@@ -8,8 +8,9 @@ Where this fits: this file describes how the algorithm becomes a runnable system
 
 Artifacts are stored in formats chosen per type for both machine reliability and human reviewability.
 
-- **JSON with JSON Schema** for all structured artifacts (rounds 1–4, 6–8, Hoare contracts, test metadata, diff annotations). JSON Schema is natively supported by LLM structured-output APIs, which constrain agents to emit only valid records and eliminate whole classes of hallucination at generation time.
-- **Quint** (`.qnt`) for formal invariants (round 5).
+- **JSON with JSON Schema** for all structured artifacts (rounds 1, 3, 4, 6–8, Hoare contracts, test metadata, diff annotations, plus the Round 2 notes companions). JSON Schema is natively supported by LLM structured-output APIs, which constrain agents to emit only valid records and eliminate whole classes of hallucination at generation time.
+- **Quint** (`.qnt`) for the formal substrate that benefits from typechecking and model-checking: **per-entity state machines (round 2)** and **invariants over them (round 5)**. Round 5's `invariants.qnt` `import`s the round-2 modules; the state vocabulary is declared once, in round 2.
+- **Round 2 split.** Each stateful entity has both a `.qnt` (states/events/actions — authoritative for the formal substrate) and a JSON `-notes.json` companion (`_note`, evidence, rationale, uncertainty, `justification_ref` — the fields Quint cannot enforce). The same split principle applies as in round 5: formal content in Quint, project metadata in JSON.
 - **Implementation-language code** for test bodies, with JSON metadata wrappers.
 - **Markdown** for genuinely prose artifacts (scope declaration, glossary, long-form narrative fields not tied to a specific structured field).
 - **Auto-generated markdown views** in `.views/rendered/` for human reading. These are regenerated from the structured sources on every commit and are never the source of truth.
@@ -67,7 +68,8 @@ spec/
 ├── scope.md                              # prose
 ├── glossary.md                           # prose
 ├── round-1/entities.json, verbs.json, actors.json
-├── round-2/<entity>-state-machine.json
+├── round-2/<entity>.qnt                  # state machine (states, events, actions) — authoritative
+├── round-2/<entity>-notes.json           # _note + evidence + rationale + uncertainty per cell
 ├── round-3/<dimension>-partition.json
 ├── round-4/interactions.json
 ├── round-5/invariants.qnt
@@ -356,13 +358,13 @@ Each round decomposes into agent-sized units that produce PR-sized changes.
 
 **Round 1 (universe).** Split extraction across agents: one proposes new entities given the informal requirement and the current `round-1/entities.json`; another enumerates attributes given an entity; a third proposes value ranges given an attribute. Each agent produces a JSON patch against its target file. Parallel PRs; merge at review.
 
-**Round 2 (state-event matrix).** The matrix factors naturally. One agent per state or per event: produce a cell (or row of cells) in `round-2/<entity>-state-machine.json`. Each cell fits in context, is independently verifiable, and carries its own `_note`. The orchestrator collects cell PRs and flags empty cells via CI check.
+**Round 2 (state machines).** Two artefacts per stateful entity: `round-2/<entity>.qnt` (the formal state machine) and `round-2/<entity>-notes.json` (per-cell metadata). The matrix factors naturally. One agent per state or per event: add a guarded branch to `handle_<event>` in the `.qnt` and a matching cell record in the notes file. Each cell fits in context, is independently verifiable, and carries its own `_note`. The orchestrator collects cell PRs and flags empty cells via CI check; `quint typecheck` on every `.qnt` runs alongside.
 
 **Round 3 (partitioning).** One agent per input dimension, producing a patch against `round-3/<dimension>-partition.json`. Independent per dimension.
 
 **Round 4 (cross-product).** Orchestrator enumerates entity pairs, prunes obvious non-interactions with a lightweight classifier agent, and dispatches remaining pairs to detailed-analysis agents. Each agent sees only two entity files and their state machines.
 
-**Round 5 (formal invariants).** One agent per invariant, editing `round-5/invariants.qnt` plus the corresponding rationale entry in `round-5/invariant-rationale.json`. A non-LLM CI job runs the Quint checker on every push. Counterexamples are committed to `round-5/traces/` and dispatched to a counterexample-interpreter agent that opens a follow-up PR proposing a fix.
+**Round 5 (formal invariants).** One agent per invariant, editing `round-5/invariants.qnt` (which `import`s the round-2 modules) plus the corresponding rationale entry in `round-5/invariant-rationale.json`. **Round 5's permitted edits are `val`, `import`, `allInvariants`, comments, and compositional `init`/`step` that stitch together the imported round-2 actions.** New `var`, `type`, or `action` declarations are owned by round 2; if an invariant requires new state, the agent stops and files a round-2 PR first. The rule is enforced at PR review and by `spec/.ci/checks/check_round5_layer_boundary.py`, which inspects the round-5 diff. A non-LLM CI job runs the Quint checker on every push. Counterexamples are committed to `round-5/traces/` and dispatched to a counterexample-interpreter agent that opens a follow-up PR proposing a fix.
 
 **Round 6 (quality attributes).** Parallelize by quality dimension. Each agent works against a known checklist template for its quality, editing its section of `round-6/quality.json`.
 

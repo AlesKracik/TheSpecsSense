@@ -13,7 +13,7 @@ Specify behavior for one ordered or unordered entity pair (A, B) (sometimes trip
 ## Context provided
 
 - The entity records for A, B (and C if 3-way)
-- The state-machine.json for each entity (so you can reason about lifecycle overlap)
+- The Round 2 artefacts for each entity (`round-2/<entity>.qnt` for the state machine and `round-2/<entity>-notes.json` for per-cell rationale) so you can reason about lifecycle overlap
 - The verb catalog (subset operating on A or B)
 - Existing entries in `interactions.json` involving A or B
 

@@ -17,7 +17,7 @@ B. **Over-strong invariant.** The invariant rules out a behavior that is actuall
 
 - The trace file (full)
 - `spec/round-5/invariants.qnt` and `invariant-rationale.json` for the violated invariant
-- The Round 2 state-machine.json for any entity referenced in the trace
+- The Round 2 `<entity>.qnt` module and `<entity>-notes.json` companion for any entity referenced in the trace
 - The Round 4 interactions involving entities in the trace
 - The Round 8 assumptions referencing the violated invariant
 

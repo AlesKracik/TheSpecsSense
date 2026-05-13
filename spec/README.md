@@ -112,10 +112,10 @@ All paths are project-root-relative — i.e., what you'd type from your project'
 | `spec/scope.md` | Prose declaration of Mode + what is in / out of scope + stakeholder panel + bounded constants + Evidence sources. Human-authored. The single most important input. |
 | `spec/glossary.md` | Shared vocabulary. Human-curated, but the LLM proposes additions via PR. |
 | `spec/round-1/` | Entities, verbs, actors. JSON. |
-| `spec/round-2/` | One state-event matrix file per stateful entity. JSON. |
+| `spec/round-2/` | Per stateful entity: a Quint module `<entity-id>.qnt` (states, events, actions — authoritative) and a JSON companion `<entity-id>-notes.json` (per-cell `_note`, evidence, rationale, uncertainty). |
 | `spec/round-3/` | One partition file per input dimension. JSON. |
 | `spec/round-4/` | Cross-product interaction table. JSON. |
-| `spec/round-5/` | Quint formal invariants + rationale + counterexample traces. |
+| `spec/round-5/` | Quint formal invariants + rationale + counterexample traces. `invariants.qnt` `import`s every Round 2 module; Round 5 only adds `val` predicates over them. |
 | `spec/round-6/` | Quality-attribute matrix. JSON. |
 | `spec/round-7/` | Adversarial scenario catalog (STRIDE). JSON. |
 | `spec/round-8/` | Assumption registry. JSON. |
@@ -147,6 +147,7 @@ This runs:
 - Referential-integrity check across all rounds
 - `_note` presence and length check
 - Round-2 completeness check (no empty cells)
+- Quint typecheck on every `round-2/*.qnt` (if `quint` is installed) — catches the Round 2 ↔ Round 5 vocabulary mismatch before model-checking
 - Quint model checker on `round-5/invariants.qnt` (if `quint` is installed)
 
 Wire it into your CI provider as a single step. PRs that fail any check are blocked from merge. The LLM (per `spec/AGENTS.md`) runs this locally before every commit it proposes.
